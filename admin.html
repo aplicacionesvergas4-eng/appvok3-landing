@@ -489,7 +489,7 @@
         const { data, error } = await sb.from('resenas')
           .select(`
             id, calificacion, texto, created_at,
-            profesor:profesores(nombre, materia),
+            profesor:profesores(nombre),
             alumno:usuarios(nombre, correo)
           `)
           .order('created_at', { ascending: false });
