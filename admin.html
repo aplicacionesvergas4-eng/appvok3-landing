@@ -486,7 +486,7 @@
     // ── Reseñas ───────────────────────────────────────────
     async function cargarReseñas() {
       try {
-        const { data, error } = await sb.from('reseñas')
+        const { data, error } = await sb.from('resenas')
           .select(`
             id, calificacion, texto, created_at,
             profesor:profesores(nombre, materia),
@@ -547,7 +547,7 @@
       document.getElementById('confirm-overlay').classList.remove('show');
 
       try {
-        const { error } = await sb.from('reseñas').delete().eq('id', resenaAEliminar);
+        const { error } = await sb.from('resenas').delete().eq('id', resenaAEliminar);
         if (error) throw error;
         resenaAEliminar = null;
         // Refrescar tabla
