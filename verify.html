@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificando cuenta — VoK3</title>
+  <link rel="icon" href="./assets/IconoFinal.png" />
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    .page-center {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .verify-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .verify-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 24px;
+    }
+
+    .icon-loading { background: rgba(255,255,255,0.06); border: 1px solid var(--border); }
+    .icon-success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); }
+    .icon-error   { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.3); }
+
+    .verify-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .verify-card p  { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+
+    .verify-actions { display: flex; flex-direction: column; gap: 10px; }
+
+    .brand-mini {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 32px;
+      justify-content: center;
+    }
+
+    .brand-mini img {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      object-fit: contain;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-center">
+    <div class="verify-card">
+      <div class="brand-mini">
+        <img src="./assets/IconoFinal.png" alt="VoK3" />
+        VoK3
+      </div>
+
+      <!-- Estado: cargando -->
+      <div id="state-loading">
+        <div class="verify-icon icon-loading">
+          <div class="spinner"></div>
+        </div>
+        <h1>Verificando tu cuenta…</h1>
+        <p>Un momento, estamos confirmando tu correo.</p>
+      </div>
+
+      <!-- Estado: éxito -->
+      <div id="state-success" class="hidden">
+        <div class="verify-icon icon-success">✓</div>
+        <h1>¡Cuenta verificada!</h1>
+        <p>Tu correo fue confirmado correctamente. Ya puedes iniciar sesión en VoK3.</p>
+        <div class="verify-actions">
+          <button class="btn btn-primary" onclick="abrirApp()">
+            Abrir VoK3
+          </button>
+          <a href="/" class="btn btn-secondary">Volver al inicio</a>
+        </div>
+      </div>
+
+      <!-- Estado: error -->
+      <div id="state-error" class="hidden">
+        <div class="verify-icon icon-error">✕</div>
+        <h1>Enlace inválido</h1>
+        <p id="error-msg">El enlace de verificación expiró o ya fue usado. Intenta registrarte de nuevo.</p>
+        <div class="verify-actions">
+          <a href="/" class="btn btn-primary">Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function mostrar(id) {
+      ['state-loading', 'state-success', 'state-error'].forEach(s => {
+        document.getElementById(s).classList.toggle('hidden', s !== id);
+      });
+    }
+
+    function abrirApp() {
+      window.location.href = 'appvok3://verified';
+      setTimeout(() => {
+        document.querySelector('#state-success p').textContent =
+          '¡Verificación completada! Abre la app VoK3 en tu dispositivo para continuar.';
+      }, 1800);
+    }
+
+    async function verificar() {
+      const search = new URLSearchParams(window.location.search);
+      const hash   = new URLSearchParams(window.location.hash.substring(1));
+
+      const tokenHash   = search.get('token_hash');
+      const type        = search.get('type') || hash.get('type');
+      const accessToken = hash.get('access_token');
+      const refreshToken = hash.get('refresh_token');
+
+      try {
+        // Supabase nuevo — token_hash en query params (PKCE)
+        if (tokenHash && type) {
+          const { error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type });
+          if (error) throw error;
+          mostrar('state-success');
+          return;
+        }
+
+        // Supabase viejo — access_token en hash fragment
+        if (accessToken && type === 'signup') {
+          const { error } = await sb.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+          });
+          if (error) throw error;
+          mostrar('state-success');
+          return;
+        }
+
+        throw new Error('Parámetros de verificación no encontrados.');
+      } catch (e) {
+        document.getElementById('error-msg').textContent =
+          e.message || 'El enlace expiró o ya fue usado.';
+        mostrar('state-error');
+      }
+    }
+
+    verificar();
+  </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoK3 — Guía de Supervivencia CECyT 3</title>
+  <meta name="description" content="La app de la comunidad estudiantil del CECyT 3 del IPN. Comparte apuntes, califica profesores y mantente al día con tu generación." />
+  <link rel="icon" href="./assets/IconoFinal.png" />
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    /* ── Glow radial de fondo ── */
+    .hero-glow {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse at center, rgba(139,0,0,0.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 40px 80px;
+    }
+
+    .hero-content { flex: 1; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fca5a5;
+      background: rgba(139,0,0,0.18);
+      border: 1px solid rgba(139,0,0,0.4);
+      border-radius: 50px;
+      padding: 5px 14px;
+      margin-bottom: 24px;
+    }
+
+    .hero-eyebrow span { width: 7px; height: 7px; background: #8B0000; border-radius: 50%; }
+
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em { font-style: normal; color: #c62828; }
+
+    .hero p {
+      font-size: 17px;
+      color: rgba(255,255,255,0.62);
+      line-height: 1.7;
+      max-width: 460px;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* ── Logo card ── */
+    .hero-visual {
+      flex-shrink: 0;
+      width: 280px;
+      height: 280px;
+      border-radius: 32px;
+      background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .hero-visual img { width: 220px; height: 220px; object-fit: contain; }
+
+    /* ── Divider ── */
+    .section-divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Features ── */
+    .features {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px 40px;
+    }
+
+    .features-header { text-align: center; margin-bottom: 48px; }
+    .features-header h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .features-header p { font-size: 15px; color: var(--text-muted); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-guinda);
+      background: var(--bg-card-hover);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(139,0,0,0.18);
+      border: 1px solid rgba(139,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+    /* ── CTA ── */
+    .cta-section {
+      max-width: 1100px;
+      margin: 0 auto 80px;
+      padding: 0 40px;
+    }
+
+    .cta-card {
+      background: linear-gradient(135deg, rgba(139,0,0,0.2), rgba(99,0,25,0.15));
+      border: 1px solid var(--border-guinda);
+      border-radius: var(--radius-lg);
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .cta-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .cta-card p { font-size: 15px; color: var(--text-muted); }
+    .cta-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      .hero { flex-direction: column; padding: 60px 20px 48px; text-align: center; }
+      .hero p { max-width: 100%; }
+      .hero-actions { justify-content: center; }
+      .hero-visual { width: 200px; height: 200px; }
+      .hero-visual img { width: 160px; height: 160px; }
+      .features { padding: 48px 20px; }
+      .cta-section { padding: 0 20px; }
+      .cta-card { flex-direction: column; padding: 32px 24px; text-align: center; }
+      .cta-actions { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <img src="./assets/IconoFinal.png" alt="VoK3" />
+      VoK3
+    </a>
+    <ul class="navbar-links">
+      <li><a href="#features">Funciones</a></li>
+      <li><a href="./manual-usuario.pdf" target="_blank">Manual</a></li>
+      <li><a href="./admin.html">Admin</a></li>
+      <li><a href="#descargar" class="btn-nav">Descargar</a></li>
+    </ul>
+  </nav>
+
+  <div style="position:relative; overflow:hidden;">
+    <div class="hero-glow"></div>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span></span>
+          CECyT 3 · IPN
+        </div>
+        <h1>Tu <em>Guía de<br>Supervivencia</em><br>estudiantil</h1>
+        <p>
+          Accede a apuntes y exámenes, califica a tus profesores
+          y conecta con la comunidad del CECyT 3 — todo desde tu celular.
+        </p>
+        <div class="hero-actions">
+          <a id="btn-apk" href="#" class="btn btn-primary">
+            ⬇ Descargar APK
+          </a>
+          <a href="./manual-usuario.pdf" target="_blank" class="btn btn-secondary">
+            Manual de usuario
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <img src="./assets/LogoFinal.png" alt="VoK3 Logo" />
+      </div>
+    </section>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <section class="features" id="features">
+    <div class="features-header">
+      <h2>Todo lo que necesitas para sobrevivirla</h2>
+      <p>Tres secciones, un solo lugar.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📂</div>
+        <h3>Archivos por materia</h3>
+        <p>Encuentra apuntes, exámenes y guías organizados por semestre y materia. Sube los tuyos para ayudar a otros.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <h3>Califica a tus profes</h3>
+        <p>Consulta reseñas de los maestros del CECyT 3 antes de elegir. Califica del 1 al 5 con comentario opcional.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Comunidad estudiantil</h3>
+        <p>Conecta con compañeros, comparte recursos y mantente al día con tu generación.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="descargar">
+    <div class="cta-card">
+      <div>
+        <h2>Descarga VoK3</h2>
+        <p>Disponible para Android. Instala el APK directamente en tu dispositivo.</p>
+      </div>
+      <div class="cta-actions">
+        <a id="btn-apk-2" href="#" class="btn btn-primary">⬇ Descargar APK</a>
+        <a href="./manual-tecnico.pdf" target="_blank" class="btn btn-secondary">Manual técnico</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2025 VoK3 · CECyT 3 IPN</span>
+    <span>Aplicaciones Móviles · 6NM2</span>
+  </footer>
+
+  <script>
+    // Actualiza estas URLs cuando subas el APK a Supabase Storage o GitHub Releases
+    const APK_URL = '#'; // ← reemplaza con la URL real del APK
+    document.getElementById('btn-apk').href = APK_URL;
+    document.getElementById('btn-apk-2').href = APK_URL;
+  </script>
+
+</body>
+</html>

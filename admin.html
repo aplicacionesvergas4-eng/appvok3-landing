@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — VoK3</title>
+  <link rel="icon" href="./assets/IconoFinal.png" />
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    /* ── Login ── */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+    }
+
+    .login-card .brand-mini {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 28px;
+      justify-content: center;
+    }
+
+    .login-card .brand-mini img {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: #fff;
+      object-fit: contain;
+    }
+
+    .login-card h1 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .login-card .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+    .login-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+
+    /* ── Dashboard layout ── */
+    .dashboard { display: none; min-height: 100vh; flex-direction: column; }
+
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,12,0.9);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .dash-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .dash-header .brand img {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: #fff;
+      object-fit: contain;
+    }
+
+    .dash-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-pill {
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 5px 14px;
+    }
+
+    .dash-body { display: flex; flex: 1; }
+
+    .dash-sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 20px 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      user-select: none;
+    }
+
+    .nav-item:hover { background: var(--bg-card); color: var(--text); }
+    .nav-item.active { background: rgba(139,0,0,0.15); color: #fca5a5; border: 1px solid var(--border-guinda); }
+
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 18px 14px 6px;
+    }
+
+    .dash-main { flex: 1; padding: 32px; min-width: 0; }
+
+    .dash-section { display: none; }
+    .dash-section.active { display: block; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .section-header h2 { font-size: 20px; font-weight: 700; }
+    .section-header .count {
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 4px 12px;
+    }
+
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .stat-card .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .stat-card .stat-value { font-size: 28px; font-weight: 700; }
+
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .table-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      color: var(--text-muted);
+      font-size: 14px;
+      gap: 12px;
+    }
+
+    .table-empty {
+      padding: 48px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .burros { color: #f59e0b; letter-spacing: 1px; }
+
+    .truncate { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .confirm-overlay.show { display: flex; }
+
+    .confirm-box {
+      background: #161618;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .confirm-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .confirm-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+    @media (max-width: 768px) {
+      .dash-sidebar { display: none; }
+      .dash-main { padding: 20px; }
+      .dash-header { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Login ──────────────────────────────────────────── -->
+  <div id="login-page" class="login-page">
+    <div class="login-card">
+      <div class="brand-mini">
+        <img src="./assets/IconoFinal.png" alt="VoK3" />
+        VoK3 Admin
+      </div>
+      <h1>Iniciar sesión</h1>
+      <p class="subtitle">Solo los administradores tienen acceso a este panel.</p>
+
+      <div id="login-error" class="msg msg-error hidden" style="margin-bottom:14px;"></div>
+
+      <div class="login-fields">
+        <div class="input-group">
+          <label for="email">Correo</label>
+          <input type="email" id="email" placeholder="tu@correo.com" />
+        </div>
+        <div class="input-group">
+          <label for="pass">Contraseña</label>
+          <input type="password" id="pass" placeholder="••••••••" />
+        </div>
+      </div>
+
+      <button id="btn-login" class="btn btn-primary" style="width:100%; justify-content:center;" onclick="iniciarSesion()">
+        Entrar
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Dashboard ──────────────────────────────────────── -->
+  <div id="dashboard" class="dashboard">
+
+    <header class="dash-header">
+      <div class="brand">
+        <img src="./assets/IconoFinal.png" alt="VoK3" />
+        VoK3 Admin
+      </div>
+      <div class="dash-header-right">
+        <span class="user-pill" id="admin-email-pill">—</span>
+        <button class="btn btn-secondary" style="padding:7px 16px; font-size:13px;" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <div class="dash-body">
+      <nav class="dash-sidebar">
+        <div class="nav-section-label">Secciones</div>
+        <div class="nav-item active" onclick="cambiarSeccion('usuarios', this)">
+          👤 Usuarios
+        </div>
+        <div class="nav-item" onclick="cambiarSeccion('reseñas', this)">
+          ⭐ Reseñas
+        </div>
+      </nav>
+
+      <main class="dash-main">
+
+        <!-- Sección Usuarios -->
+        <div id="sec-usuarios" class="dash-section active">
+          <div class="section-header">
+            <h2>Usuarios</h2>
+            <span class="count" id="count-usuarios">—</span>
+          </div>
+          <div class="stat-cards">
+            <div class="stat-card">
+              <div class="stat-label">Total registrados</div>
+              <div class="stat-value" id="stat-total-usuarios">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Con foto de perfil</div>
+              <div class="stat-value" id="stat-con-foto">—</div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div id="tabla-usuarios-loading" class="table-loading">
+              <div class="spinner"></div> Cargando usuarios…
+            </div>
+            <div id="tabla-usuarios-empty" class="table-empty hidden">No hay usuarios registrados.</div>
+            <div class="table-wrap hidden" id="tabla-usuarios-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Registro</th>
+                    <th>Admin</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-usuarios"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección Reseñas -->
+        <div id="sec-reseñas" class="dash-section">
+          <div class="section-header">
+            <h2>Reseñas</h2>
+            <span class="count" id="count-reseñas">—</span>
+          </div>
+          <div class="table-card">
+            <div id="tabla-reseñas-loading" class="table-loading">
+              <div class="spinner"></div> Cargando reseñas…
+            </div>
+            <div id="tabla-reseñas-empty" class="table-empty hidden">No hay reseñas aún.</div>
+            <div class="table-wrap hidden" id="tabla-reseñas-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Alumno</th>
+                    <th>Profesor</th>
+                    <th>Calificación</th>
+                    <th>Comentario</th>
+                    <th>Fecha</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-reseñas"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ── Confirmar eliminación ──────────────────────────── -->
+  <div id="confirm-overlay" class="confirm-overlay">
+    <div class="confirm-box">
+      <h3>Eliminar reseña</h3>
+      <p id="confirm-msg">¿Estás seguro de que quieres eliminar esta reseña? Esta acción no se puede deshacer.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" onclick="cancelarEliminar()">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmarEliminar()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let resenaAEliminar = null;
+
+    // ── Auth ──────────────────────────────────────────────
+    async function iniciarSesion() {
+      const email = document.getElementById('email').value.trim();
+      const pass  = document.getElementById('pass').value.trim();
+      const btn   = document.getElementById('btn-login');
+      const errDiv = document.getElementById('login-error');
+
+      errDiv.classList.add('hidden');
+      if (!email || !pass) {
+        errDiv.textContent = 'Ingresa correo y contraseña.';
+        errDiv.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Entrando…';
+
+      try {
+        const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+        if (error) throw error;
+
+        // Verificar is_admin
+        const { data: { user } } = await sb.auth.getUser();
+        const { data: perfil, error: perfilErr } = await sb.from('usuarios')
+          .select('is_admin, nombre')
+          .eq('id', user.id)
+          .single();
+
+        if (perfilErr || !perfil?.is_admin) {
+          await sb.auth.signOut();
+          throw new Error('No tienes permisos de administrador.');
+        }
+
+        mostrarDashboard(user.email, perfil.nombre);
+      } catch (e) {
+        errDiv.textContent = e.message || 'Error al iniciar sesión.';
+        errDiv.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+
+    async function cerrarSesion() {
+      await sb.auth.signOut();
+      location.reload();
+    }
+
+    function mostrarDashboard(email, nombre) {
+      document.getElementById('login-page').style.display = 'none';
+      const dash = document.getElementById('dashboard');
+      dash.style.display = 'flex';
+      document.getElementById('admin-email-pill').textContent = nombre || email;
+      cargarUsuarios();
+    }
+
+    // ── Navegación ────────────────────────────────────────
+    function cambiarSeccion(id, el) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('sec-' + id).classList.add('active');
+
+      if (id === 'reseñas' && !document.getElementById('tbody-reseñas').innerHTML) {
+        cargarReseñas();
+      }
+    }
+
+    // ── Usuarios ──────────────────────────────────────────
+    async function cargarUsuarios() {
+      try {
+        const { data, error } = await sb.from('usuarios')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        document.getElementById('tabla-usuarios-loading').classList.add('hidden');
+
+        if (!data.length) {
+          document.getElementById('tabla-usuarios-empty').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('count-usuarios').textContent = data.length + ' usuarios';
+        document.getElementById('stat-total-usuarios').textContent = data.length;
+        document.getElementById('stat-con-foto').textContent = data.filter(u => u.avatar_url).length;
+
+        const tbody = document.getElementById('tbody-usuarios');
+        tbody.innerHTML = data.map(u => `
+          <tr>
+            <td><strong>${esc(u.nombre || '—')}</strong></td>
+            <td style="color:var(--text-muted)">${esc(u.correo || '—')}</td>
+            <td style="color:var(--text-muted)">${esc(u.telefono || '—')}</td>
+            <td style="color:var(--text-muted); white-space:nowrap">${fechaCorta(u.created_at)}</td>
+            <td>${u.is_admin ? '<span class="badge">Admin</span>' : ''}</td>
+          </tr>
+        `).join('');
+
+        document.getElementById('tabla-usuarios-wrap').classList.remove('hidden');
+      } catch (e) {
+        document.getElementById('tabla-usuarios-loading').innerHTML =
+          `<span style="color:#f87171">Error al cargar: ${esc(e.message)}</span>`;
+      }
+    }
+
+    // ── Reseñas ───────────────────────────────────────────
+    async function cargarReseñas() {
+      try {
+        const { data, error } = await sb.from('reseñas')
+          .select(`
+            id, calificacion, texto, created_at,
+            profesor:profesores(nombre, materia),
+            alumno:usuarios(nombre, correo)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        document.getElementById('tabla-reseñas-loading').classList.add('hidden');
+
+        if (!data.length) {
+          document.getElementById('tabla-reseñas-empty').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('count-reseñas').textContent = data.length + ' reseñas';
+
+        const tbody = document.getElementById('tbody-reseñas');
+        tbody.innerHTML = data.map(r => `
+          <tr>
+            <td>
+              <div style="font-weight:500">${esc(r.alumno?.nombre || '—')}</div>
+              <div style="font-size:12px;color:var(--text-muted)">${esc(r.alumno?.correo || '')}</div>
+            </td>
+            <td>
+              <div style="font-weight:500">${esc(r.profesor?.nombre || '—')}</div>
+              <div style="font-size:12px;color:var(--text-muted)">${esc(r.profesor?.materia || '')}</div>
+            </td>
+            <td><span class="burros">${'🐴'.repeat(r.calificacion)}</span></td>
+            <td><span class="truncate" title="${esc(r.texto)}">${esc(r.texto || '—')}</span></td>
+            <td style="color:var(--text-muted); white-space:nowrap">${fechaCorta(r.created_at)}</td>
+            <td><button class="btn btn-danger" onclick="pedirEliminar('${r.id}', '${esc(r.alumno?.nombre || '')}', '${esc(r.profesor?.nombre || '')}')">Eliminar</button></td>
+          </tr>
+        `).join('');
+
+        document.getElementById('tabla-reseñas-wrap').classList.remove('hidden');
+      } catch (e) {
+        document.getElementById('tabla-reseñas-loading').innerHTML =
+          `<span style="color:#f87171">Error al cargar: ${esc(e.message)}</span>`;
+      }
+    }
+
+    function pedirEliminar(id, alumno, profesor) {
+      resenaAEliminar = id;
+      document.getElementById('confirm-msg').textContent =
+        `¿Eliminar la reseña de ${alumno} sobre ${profesor}? Esta acción no se puede deshacer.`;
+      document.getElementById('confirm-overlay').classList.add('show');
+    }
+
+    function cancelarEliminar() {
+      resenaAEliminar = null;
+      document.getElementById('confirm-overlay').classList.remove('show');
+    }
+
+    async function confirmarEliminar() {
+      if (!resenaAEliminar) return;
+      document.getElementById('confirm-overlay').classList.remove('show');
+
+      try {
+        const { error } = await sb.from('reseñas').delete().eq('id', resenaAEliminar);
+        if (error) throw error;
+        resenaAEliminar = null;
+        // Refrescar tabla
+        document.getElementById('tbody-reseñas').innerHTML = '';
+        document.getElementById('tabla-reseñas-wrap').classList.add('hidden');
+        document.getElementById('tabla-reseñas-loading').classList.remove('hidden');
+        document.getElementById('tabla-reseñas-loading').innerHTML = `
+          <div class="spinner"></div> Cargando reseñas…
+        `;
+        cargarReseñas();
+      } catch (e) {
+        alert('Error al eliminar: ' + e.message);
+      }
+    }
+
+    // ── Helpers ───────────────────────────────────────────
+    function esc(str) {
+      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function fechaCorta(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    // ── Enter en login ────────────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('login-page').style.display !== 'none') {
+        iniciarSesion();
+      }
+    });
+
+    // ── Revisar sesión al cargar ──────────────────────────
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        const { data: perfil } = await sb.from('usuarios')
+          .select('is_admin, nombre')
+          .eq('id', session.user.id)
+          .single();
+        if (perfil?.is_admin) {
+          mostrarDashboard(session.user.email, perfil.nombre);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
